@@ -32,7 +32,41 @@ router.get('/api/products/search/:searchQuery',auth, async (req,res,next)=>{
             msg : e.message,
         })
     }
-})
+});
+
+router.post('/api/rate-product',auth, async (req,res,next)=>{
+    try{
+        const { pid,rating } = req.body;
+        // console.log(rating);
+        // console.log(pid);
+        let product = await Product.findById(pid);
+        // console.log(product);
+        // console.log(product.ratings);
+        for(let i=0;i<product.ratings.length;i++){
+            if(product.ratings[i].userId==req.user){
+                product.ratings.splice(i,1);
+                break;
+            }
+        }
+
+        const ratingSchema = {
+            userId : req.user,
+            rating : rating
+        }
+
+        product.ratings.push(ratingSchema);
+        console.log(product.ratings);
+
+        product = await product.save();
+
+        res.status(200).json(product);
+
+    }catch(err){
+        res.status(500).json({
+            msg : err.message,
+        })
+    }
+});
 
 
 
