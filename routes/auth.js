@@ -1,114 +1,116 @@
-const express = require("express");
-const User = require('../models/user');
-const bcryptjs = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const router = express.Router();
-const auth = require('../middlewares/auth');
+const express = require('express')
+const User = require('../models/user')
+const bcryptjs = require('bcryptjs')
+const jwt = require('jsonwebtoken')
+const auth = require('../middlewares/auth')
 
 
-router.post('/admin/signup', async (req,res,next)=>{
+const authRouter = express.Router()
+
+authRouter.post('/api/signup', async (req,res,next)=>{
+
     try{
-        console.log(req.body);
-        const { email,password,name } = req.body;
-        console.log('reached');
-        console.log(`email fo the user is ${email}`);
-        const existingUser = await User.findOne({email : email});
+        const {name , email, password} = req.body;
+
+        // console.log(`name is : ${name}`)
+        // console.log(`name is : ${email}`)
+        // console.log(`name is : ${password}`)
+    
+        const existingUser = await User.findOne({ email : email })
+    
         if(existingUser){
-            return res.status(400).json({msg : 'user with same email already exist'})
+            return res.status(400).json({
+                msg : 'User with Email Already exits'
+            })
         }
-        const hashedPassword = await bcryptjs.hash(password,8);
+
+        const hashpswd =  await bcryptjs.hash(password,8) 
+    
         let user = new User({
             name : name,
             email : email,
-            password : hashedPassword
-        });
-        console.log(user);
+            password : hashpswd,
+    
+        })
+    
         user = await user.save();
-        res.status(200).json({user : user});
-    }catch(e){
-        res.status(500).json({msg : 'something went wrong with mongo in user creation'})
-    }
-
-});
-
-router.post('/api/signin', async (req,res,next)=>{
-    try{
-        // console.log(req.body); 
-        const { email,password } = req.body;
-        // console.log(email);
-        // console.log(password);
-        const user = await User.findOne({email:email});
-        if(!user){
-            res.status(400).json({
-                msg : 'This email doesnot exist'
-            })
-        }
-        const isMatch = await bcryptjs.compare(password,user.password);
-        if(!isMatch){
-            res.status(400).json({
-                msg : "password doesnot match"
-            })
-        }
-
-        const token =  jwt.sign({id:user._id},"passwordKey");
-        // console.log(token);
-
+    
         res.status(200).json({
-            token : token,
-            ...user._doc
+            user : user
         })
-        
-
     }catch(e){
         res.status(500).json({
-            msg : "something terrible went wrong",
+            error : e.message
         })
     }
 });
 
-router.post('/tokenIsValid', async (req,res,next)=>{
+
+authRouter.get('/api/signin', async (req,res,next)=>{
+    const { email,password } = req.headers;
+
+    // const email = req.headers['email']
+    // const password = req.headers['password']
+
+    // console.log(req.headers)
+
+    // console.log(`email is : ${email}`)
+    // console.log(`password is : ${password}`)
+
     try{
-        const token = req.header('x-auth-token');
-        console.log(token);
-        if(!token) res.status(400).json({
-            msg : 'no token found',
-        });
+        const existingUser = await User.findOne({ email });
 
-        const verified = jwt.verify(token,'passwordKey');
-        if(!verified) res.status(400).json(({
-            msg : 'not verified',
-        }));
+        if(!existingUser){
+            return res.status(400).json({
+                msg : "No username/Email exists for these credentials"
+            })
+        }
+        // console.log(existingUser['password'])
 
-        const user = await User.findById(verified.id);
-        console.log(user);
-        if(!user) res.status(400).json({
-            msg : 'user not found',
-        });
+        bcryptjs.compare(password,existingUser['password'],
+            async (err,match)=>{
+                if(match){
+                    const token = jwt.sign({id : existingUser._id},"passwordkey")
+                    return res.status(200).json({token,...existingUser._doc})
+                }else{
+                    return res.status(400).json({
+                        msg : 'password doesnot match'
+                    })
+                }
+            }
 
-        res.status(200).json({
-            msg : 'Voila found',
-        });
+
+        )
     }catch(e){
-        res.status(500).json({
-            msg : e.message,
-        });
-    }
-});
-
-router.get('/',auth,async (req,res,next)=>{
-    const user = await User.findById(req.user);
-    if(!user){
-        res.status(400).json({
-            msg : 'no user found',
+        return res.status(500).json({
+            error : e.message
         })
     }
+    
+})
+
+authRouter.post('/isValidToken',async(req,res,next)=>{
+    const token = req.header('x-auth-token');
+    // console.log(token)
+    if(!token) return res.json(false)
+    const verified = jwt.verify(token,"passwordkey");
+    if(!verified) return res.json(false);
+
+    const user = await User.findById(verified.id);
+    if(!user) return res.json(false);
+
+    return res.json(true);
+
+})
+
+authRouter.get('/',auth,async(req,res,next)=>{
+    const user = await User.findById(req.user)
     res.status(200).json({
-        ...user._doc ,token : req.token,
-    });
-});
+        ...user._doc,
+        token : req.token
+    })
+
+})
 
 
-
-
-
-module.exports = router;
+module.exports = authRouter

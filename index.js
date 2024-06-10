@@ -1,30 +1,30 @@
+const PORT = 3000;
 const express = require('express');
+const DB  = require('./locker');
 const mongoose = require('mongoose');
-
-const authRouter = require('./routes/auth');
-const adminRouter = require('./routes/admin');
-const productRouter = require('./routes/product');
 
 const app = express();
 
-
-app.use(express.json());
-app.use(authRouter);
-app.use(adminRouter);
-app.use(productRouter);
+const authRouter = require('./routes/auth')
 
 
-mongoose.connect(
-    'mongodb+srv://aryan:mongo@cartcluster.0qhwtdi.mongodb.net/'
-)
+app.use(express.json())
+app.use(authRouter)
+
+app.get('/',(req,res,next)=>{
+    res.send('hello world')
+})
+
+
+mongoose.connect(DB)
 .then(()=>{
-    console.log('connected to mongo');
+    console.log('connection to database successfull')
 })
 .catch((e)=>{
-    console.log('error in connecting to mongo');
     console.log(e)
 })
 
-app.listen(3000,'0.0.0.0',()=>{
-    console.log('Port started')
+
+app.listen(PORT,"0.0.0.0",()=>{
+    console.log(`connection set on ${PORT}`);
 })
