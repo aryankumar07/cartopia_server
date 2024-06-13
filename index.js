@@ -5,11 +5,13 @@ const mongoose = require('mongoose');
 
 const app = express();
 
-const authRouter = require('./routes/auth')
+const authRouter = require('./routes/auth');
+const adminRouter = require('./routes/admin');
 
 
 app.use(express.json())
 app.use(authRouter)
+app.use(adminRouter)
 
 app.get('/',(req,res,next)=>{
     res.send('hello world')
@@ -25,6 +27,6 @@ mongoose.connect(DB)
 })
 
 
-app.listen(PORT,"0.0.0.0",()=>{
+app.listen(PORT,()=>{
     console.log(`connection set on ${PORT}`);
 })
