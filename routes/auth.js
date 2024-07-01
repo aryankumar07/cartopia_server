@@ -49,6 +49,8 @@ authRouter.post('/api/signup', async (req,res,next)=>{
 authRouter.get('/api/signin', async (req,res,next)=>{
     const { email,password } = req.headers;
 
+    console.log('entered')
+
     // const email = req.headers['email']
     // const password = req.headers['password']
 

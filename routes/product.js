@@ -1,18 +1,18 @@
 const express = require('express')
 const auth = require('../middlewares/auth')
 const productRouter = express.Router();
-const Product = require('../models/product');
+const {Product} = require('../models/product');
 const ratingSchema = require('../models/rating');
 
 
 productRouter.get('/api/products',auth,async (req,res,next)=>{
     try{
 
-        console.log('entered in the backend of /api/products')
+        // console.log('entered in the backend of /api/products')
 
         const category = req.query.category
 
-        console.log(category)
+        // console.log(category)
 
         const products = await Product.find({
             category : category
@@ -41,13 +41,13 @@ productRouter.get('/api/products',auth,async (req,res,next)=>{
 productRouter.get('/api/products/search/:name',auth,async(req,res,next)=>{
     try{
         const query = req.params.name 
-        console.log(query)
+        // console.log(query)
 
         const products = await Product.find({
             name : { $regex : query , $options : 'i' },
         })
 
-        console.log(products)
+        // console.log(products)
 
         res.status(200).json(products);
 
@@ -98,7 +98,7 @@ productRouter.post('/api/products/rating',auth, async (req,res,next)=>{
         }
 
 
-        console.log(ratingSchema)
+        // console.log(ratingSchema)
 
         product.rating.push(ratingSchema);
 
