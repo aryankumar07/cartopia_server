@@ -1,6 +1,6 @@
 const PORT = 3000;
 const express = require('express');
-const DB  = require('./locker');
+const { DB }  = require('./locker');
 const mongoose = require('mongoose');
 
 const app = express();

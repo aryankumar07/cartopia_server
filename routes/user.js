@@ -78,4 +78,22 @@ userRouter.delete('/api/rm-from-cart/:id',auth, async (req,res,next)=>{
 })
 
 
+userRouter.post('/api/add-new-address',auth,async (req,res,next)=>{
+    try{
+        const newaddress = req.body['address']
+        console.log(newaddress)
+        let user = await User.findById(req.user)
+        user.address.push(newaddress);
+        user = await user.save();
+        res.status(200).json(user);
+    }catch(e){
+        res.status(500).json({
+            error : e.message
+        })
+    }
+
+
+})
+
+
 module.exports  = userRouter
