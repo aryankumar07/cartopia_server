@@ -1,6 +1,6 @@
 const PORT = 3000;
 const express = require('express');
-const { DB }  = require('./locker');
+const { DB }  = require('./locker')
 const mongoose = require('mongoose');
 
 const app = express();
@@ -9,15 +9,17 @@ const authRouter = require('./routes/auth');
 const adminRouter = require('./routes/admin');
 const productRouter = require('./routes/product');
 const userRouter = require('./routes/user')
+const checkoutRouter = require('./routes/checkout')
 
 
 app.use(express.json())
+app.use(checkoutRouter)
 app.use(authRouter)
 app.use(adminRouter)
 app.use(productRouter)
 app.use(userRouter)
 
-app.get('/',(req,res,next)=>{
+app.get('/hello-world',(req,res,next)=>{
     res.send('hello world')
 })
 
