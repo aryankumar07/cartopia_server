@@ -10,6 +10,7 @@ const adminRouter = require('./routes/admin');
 const productRouter = require('./routes/product');
 const userRouter = require('./routes/user')
 const checkoutRouter = require('./routes/checkout')
+const orderRouter = require('./routes/order')
 
 
 app.use(express.json())
@@ -18,6 +19,7 @@ app.use(authRouter)
 app.use(adminRouter)
 app.use(productRouter)
 app.use(userRouter)
+app.use(orderRouter)
 
 app.get('/hello-world',(req,res,next)=>{
     res.send('hello world')
