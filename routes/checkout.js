@@ -1,7 +1,7 @@
 const express = require('express');
 const auth = require('../middlewares/auth')
-const { STRIPE_SECRET_KEY } = require('../locker')
-const stripe = require('stripe')(STRIPE_SECRET_KEY)
+// const { STRIPE_SECRET_KEY } = require('../locker')
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 const checkoutRouter = express.Router();
 
 

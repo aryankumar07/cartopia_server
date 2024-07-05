@@ -1,6 +1,7 @@
 const express = require('express');
 const admin = require('../middlewares/admin');
 const { Product } = require('../models/product');
+const Order = require('../models/order')
 
 
 
@@ -47,7 +48,7 @@ adminRouter.get('/admin/get-product',admin, async (req,res,next)=>{
             userId : req.id,
         });
 
-        console.log(products)
+        // console.log(products)
 
         return res.status(200).json(
             products
@@ -89,6 +90,21 @@ adminRouter.post('/admin/delete-product',admin,async (req,res,next)=>{
     }catch(e){
         return res.status(500).json({
             error : 'something went wrong in deleting proces'
+        })
+    }
+})
+
+
+adminRouter.post('/admin/change-order-status',admin,async(req,res,next)=>{
+    try{
+        const { status,id } = req.body;
+        let order = Order.findById(id)
+        order.status = status;
+        order = await order.save()
+        res.status(200).json(order)
+    }catch(e){
+        res.status(500).json({
+            error : e.message
         })
     }
 })

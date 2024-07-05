@@ -1,7 +1,8 @@
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 const express = require('express');
-const { DB }  = require('./locker')
+// const { DB }  = require('./locker')
 const mongoose = require('mongoose');
+require('dotenv').config()
 
 const app = express();
 
@@ -26,7 +27,7 @@ app.get('/hello-world',(req,res,next)=>{
 })
 
 
-mongoose.connect(DB)
+mongoose.connect(process.env.DB)
 .then(()=>{
     console.log('connection to database successfull')
 })
@@ -36,5 +37,5 @@ mongoose.connect(DB)
 
 
 app.listen(PORT,()=>{
-    console.log(`connection set on ${PORT}`);
+    console.log(`connection set on ${PORT}`)
 })
